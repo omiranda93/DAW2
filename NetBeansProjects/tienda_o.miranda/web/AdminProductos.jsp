@@ -18,23 +18,34 @@
     </head>
     <body>
         <table>
-            <tr><td><b>Nombre</b></td><td><b>Precio</b></td><td><b>Categoria</b></td><tr>
+            <tr><td><b>Productos</b></td></tr>
                 <c:forEach var="producto" items="${listaProductos}" varStatus="contador">
-                <tr><td>${producto.nombre}
-                    </td><td>${producto.precio}
-                    </td><td>${producto.categoria}
-                    </td><td><img style="max-height: 200px; max-width: 200px" src="${producto.imagen}"/>
+                <tr><td><form method= "post" action='ServletAdministrador2' enctype="multipart/form-data">
+                            <input type='text' name='nombre' value="${producto.nombre}">
+                            <input type='text' name='precio' value="${producto.precio}">
+                            <select name='categoria'>
+                                <option value="${producto.categoria}">${producto.categoria}</option>
+                                <option value='Alimentacion'>Alimentación</option>
+                                <option value='Ferreteria'>Ferretería</option>
+                                <option value='Drogueria'>Droguería</option>
+                                <option value='Prensa'>Prensa</option>
+                            </select>
+                            <input type='submit' name='editar' value='Editar' onclick="alert('Has editado este producto')">
+                            <input type='hidden' name='contador' value='${contador.index}'>
+                            <input type='hidden' name='busqueda' value='editar'>
+                        </form>
                     </td><td><form method="get" action='ServletAdministrador2' >
                                 <input type='submit' name='borrar' value='Borrar' onclick="alert('Has borrado este producto')">
                                 <input type='hidden' name='contador' value='${contador.index}'>
                                 <input type='hidden' name='busqueda' value='borrar'>
                             </form>
-                </td></tr>
+                    </td>
+                </tr>
 
             </c:forEach>
         </table>
         <b>Añade un nuevo producto:</b>
-        <form method= "get" action='ServletAdministrador2' enctype="multipart/form-data">
+        <form method= "post" action='ServletAdministrador2?busqueda=productos' enctype="multipart/form-data">
             <b>Nombre:</b>
             <input type='text' name='nombre'>
             <b>Categoria:</b>

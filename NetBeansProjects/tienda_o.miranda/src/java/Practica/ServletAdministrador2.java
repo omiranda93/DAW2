@@ -64,6 +64,8 @@ public class ServletAdministrador2 extends HttpServlet {
                 formularioPedidos(out, request, response, pdao, rdao);                
             } else if (busquedaParam.equals("borrar")) {                
                 formularioBorrar(out, request, response, dao);                
+            } else if (busquedaParam.equals("editar")) {                
+                formularioEditar(out, request, response, dao);                
             }
             
             
@@ -80,14 +82,17 @@ public class ServletAdministrador2 extends HttpServlet {
  
     private void formularioProductos(PrintWriter out, HttpServletRequest request, HttpServletResponse response, ProductosDAO dao) throws IOException, ServletException, FileUploadException {
 
-        if((request.getParameter("nombre") != null)&&(request.getParameter("categoria") != null)&&(request.getParameter("imagen") != null)&&(request.getParameter("precio") != null)){            
-            try {
+        if (request.getParameter("nombre")!=null && request.getParameter("categoria")!=null && request.getParameter("precio")!=null){
+            try {                
                 String nombre = request.getParameter("nombre");
                 String categoria = request.getParameter("categoria");
-                double precio = Double.parseDouble(request.getParameter("precio"));
+                int precio = Integer.parseInt(request.getParameter("precio"));
 
                 // Create a factory for disk-based file items
                 DiskFileItemFactory factory = new DiskFileItemFactory();
+                String ubicacionArchivo = "img";
+                factory.setSizeThreshold(1024); 
+                factory.setRepository(new File(ubicacionArchivo));
 
                 // Configure a repository (to ensure a secure temp location is used)
                 ServletContext servletContext = this.getServletConfig().getServletContext();
@@ -99,25 +104,18 @@ public class ServletAdministrador2 extends HttpServlet {
 
                 // Parse the request
                 List<FileItem> items = upload.parseRequest(request);
+                String imagen = "";
+                String barra = System.getProperty("file.separator");
                 
                 // Process the uploaded items
-                Iterator<FileItem> iter = items.iterator();
-                ArrayList <String> campos = new ArrayList();
-                String barra = File.separator;
-                String imagen = "";
-                while (iter.hasNext()) {
-                    FileItem item = iter.next();
-
-                    if (item.isFormField()) {
-                        String valor = item.getString();
-                        campos.add(valor);
-                    } else {
-                        File file = new File(item.getName());
-                        String ruta = request.getServletContext().getRealPath(barra+"img");
-                        item.write(new File(ruta + barra, file.getName()));
-                        imagen = SAVE_DIR + barra + file.getName();
+                for(FileItem item : items){
+                    if (!(item.isFormField())) {
+                        File file = new File( ubicacionArchivo, item.getName());
+                        item.write(file);
+                        imagen = SAVE_DIR + barra + item.getName();
                     }
                 }
+                
                 
                 dao.insertProducto(nombre, categoria, imagen, precio);   
                 
@@ -171,6 +169,71 @@ public class ServletAdministrador2 extends HttpServlet {
             } catch (IOException ex) {
                 Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
             }
+    }
+    
+    private void formularioEditar(PrintWriter out, HttpServletRequest request, HttpServletResponse response, ProductosDAO dao) {
+
+            if(("Editar".equals(request.getParameter("editar")))){ 
+                List<Producto>productos = (List) request.getSession().getAttribute("listaProductos");
+                int posicion = parseInt(request.getParameter("contador"));
+                String nombre = productos.get(posicion).getNombre();
+                dao.deleteProducto(nombre);
+                productos = null;
+                
+                
+                
+                if (request.getParameter("nombre")!=null && request.getParameter("categoria")!=null && request.getParameter("precio")!=null){
+                try {                
+                nombre = request.getParameter("nombre");
+                String categoria = request.getParameter("categoria");
+                int precio = Integer.parseInt(request.getParameter("precio"));
+
+                // Create a factory for disk-based file items
+                DiskFileItemFactory factory = new DiskFileItemFactory();
+                String ubicacionArchivo = "img";
+                factory.setSizeThreshold(1024); 
+                factory.setRepository(new File(ubicacionArchivo));
+
+                // Configure a repository (to ensure a secure temp location is used)
+                ServletContext servletContext = this.getServletConfig().getServletContext();
+                File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
+                factory.setRepository(repository);
+
+                // Create a new file upload handler
+                ServletFileUpload upload = new ServletFileUpload(factory);
+
+                // Parse the request
+                List<FileItem> items = upload.parseRequest(request);
+                String imagen = "";
+                String barra = System.getProperty("file.separator");
+                
+                // Process the uploaded items
+                for(FileItem item : items){
+                    if (!(item.isFormField())) {
+                        File file = new File( ubicacionArchivo, item.getName());
+                        item.write(file);
+                        imagen = SAVE_DIR + barra + item.getName();
+                    }
+                }
+                
+                
+                dao.insertProducto(nombre, categoria, imagen, precio);   
+                
+            } catch(NumberFormatException e){
+                out.println("<b>Error al acceder al listado de productos</b>");
+                e.printStackTrace();
+            } catch (Exception ex) {
+                Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+            
+            request.getSession().setAttribute("listaProductos", dao.getTodosProductos());
+            try {
+                response.sendRedirect("AdminProductos.jsp");
+            } catch (IOException ex) {
+                Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
     private String extractFileName (Part part) {
