@@ -44,8 +44,7 @@
 
             </c:forEach>
         </table>
-        <b>Añade un nuevo producto:</b>
-        <form method= "post" action='ServletAdministrador2?busqueda=productos' enctype="multipart/form-data">
+        <form method= "post" action='ServletAnadirProducto' enctype="multipart/form-data">
             <b>Nombre:</b>
             <input type='text' name='nombre'>
             <b>Categoria:</b>
@@ -60,7 +59,6 @@
             <b>Precio:</b>
             <input type='text' name='precio'>
             <input type='submit' name='Añadir' value='Agregar' onclick="alert('Has añadido este producto a los disponibles.')">
-            <input type='hidden' name='busqueda' value='productos'>
         </form>
         <a href="Administracion.jsp">Volver</a>
     </body>
