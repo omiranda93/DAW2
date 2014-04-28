@@ -88,7 +88,7 @@ public class ServletAnadirProducto extends HttpServlet {
                 // Process the uploaded items
                 for(FileItem item : items){
                     if (!(item.isFormField())) {
-                        if (item.getSize() != -1){
+                        if (item.getContentType().equals("image/jpeg")){
                             File file = new File(ruta, item.getName());
                             item.write(file);
                             imagen = "img"+barra+item.getName();
@@ -121,11 +121,6 @@ public class ServletAnadirProducto extends HttpServlet {
                 dao.insertProducto(nombre, categoria, imagen, precio);
                 request.getSession().setAttribute("listaProductos", dao.getTodosProductos());
                 
-                try {
-                    response.sendRedirect("AdminProductos.jsp");
-                } catch (IOException ex) {
-                    Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
-                }
                 
             } catch(NumberFormatException e){
                 out.println("<b>Error al acceder al listado de productos</b>");
