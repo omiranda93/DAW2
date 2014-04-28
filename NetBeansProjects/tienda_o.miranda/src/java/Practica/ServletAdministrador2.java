@@ -36,7 +36,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
  * @author oscarmirandabravo
  */
 @WebServlet(urlPatterns = {"/ServletAdministrador2"})
-@MultipartConfig
 public class ServletAdministrador2 extends HttpServlet {
 
     
@@ -59,8 +58,8 @@ public class ServletAdministrador2 extends HttpServlet {
                 formularioProductos(out, request, response, dao);
             } else if (busquedaParam.equals("borrar")) {                
                 formularioBorrar(out, request, response, dao);                
-            } else if (busquedaParam.equals("editar")) {                
-                formularioEditar(out, request, response, dao);                
+            } else if (busquedaParam.equals("pedidos")) {
+                formularioPedidos(out, request, response, pdao, rdao);
             }
             
         } catch (FileUploadException ex) {
@@ -118,84 +117,7 @@ public class ServletAdministrador2 extends HttpServlet {
             } catch (IOException ex) {
                 Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
             }
-    }
-    
-    private void formularioEditar(PrintWriter out, HttpServletRequest request, HttpServletResponse response, ProductosDAO dao) {
-
-            if(("Editar".equals(request.getParameter("editar")))){ 
-                List<Producto>productos = (List) request.getSession().getAttribute("listaProductos");
-                int posicion = parseInt(request.getParameter("contador"));
-                String nombre = productos.get(posicion).getNombre();
-                dao.deleteProducto(nombre);
-                productos = null;
-                
-                
-                
-                if (request.getParameter("nombre")!=null && request.getParameter("categoria")!=null && request.getParameter("precio")!=null){
-                try {                
-                nombre = request.getParameter("nombre");
-                String categoria = request.getParameter("categoria");
-                int precio = Integer.parseInt(request.getParameter("precio"));
-
-                // Create a factory for disk-based file items
-                DiskFileItemFactory factory = new DiskFileItemFactory();
-                String ubicacionArchivo = "img";
-                factory.setSizeThreshold(1024); 
-                factory.setRepository(new File(ubicacionArchivo));
-
-                // Configure a repository (to ensure a secure temp location is used)
-                ServletContext servletContext = this.getServletConfig().getServletContext();
-                File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-                factory.setRepository(repository);
-
-                // Create a new file upload handler
-                ServletFileUpload upload = new ServletFileUpload(factory);
-
-                // Parse the request
-                List<FileItem> items = upload.parseRequest(request);
-                String imagen = "";
-                String barra = System.getProperty("file.separator");
-                
-                // Process the uploaded items
-                for(FileItem item : items){
-                    if (!(item.isFormField())) {
-                        File file = new File( ubicacionArchivo, item.getName());
-                        item.write(file);
-                        imagen = SAVE_DIR + barra + item.getName();
-                    }
-                }
-                
-                
-                dao.insertProducto(nombre, categoria, imagen, precio);   
-                
-            } catch(NumberFormatException e){
-                out.println("<b>Error al acceder al listado de productos</b>");
-                e.printStackTrace();
-            } catch (Exception ex) {
-                Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-            
-            request.getSession().setAttribute("listaProductos", dao.getTodosProductos());
-            try {
-                response.sendRedirect("AdminProductos.jsp");
-            } catch (IOException ex) {
-                Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-    
-    private String extractFileName (Part part) {
-        String contentDisp = part.getHeader("content-disposition");
-        String [] items = contentDisp.split(";");
-        for (String s : items) {
-            if (s.trim().startsWith("filename")) {
-                return s.substring(s.indexOf("=") + 2, s.length()-1);
-            }
-        }
-        return "";
-    }
-
+    }    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
