@@ -119,8 +119,6 @@ public class ServletAnadirProducto extends HttpServlet {
                 }
                 
                 dao.insertProducto(nombre, categoria, imagen, precio);
-                request.getSession().setAttribute("listaProductos", dao.getTodosProductos());
-                
                 
             } catch(NumberFormatException e){
                 out.println("<b>Error al acceder al listado de productos</b>");
