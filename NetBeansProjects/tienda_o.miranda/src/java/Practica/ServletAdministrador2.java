@@ -39,7 +39,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 @MultipartConfig
 public class ServletAdministrador2 extends HttpServlet {
 
-   private static final String SAVE_DIR = "img";
     
    @Resource(lookup = "jdbc/tienda_omiranda")
     private DataSource ds;
@@ -53,21 +52,16 @@ public class ServletAdministrador2 extends HttpServlet {
         
         try (PrintWriter out = response.getWriter()) {
 
-
-            
-            final String busquedaParam = request.getParameter("busqueda");
+            String busquedaParam = request.getParameter("busqueda");
 
             if (busquedaParam == null) {
             } else if (busquedaParam.equals("productos")) {                
-                formularioProductos(out, request, response, dao);                
-            } else if (busquedaParam.equals("pedidos")) {                
-                formularioPedidos(out, request, response, pdao, rdao);                
+                formularioProductos(out, request, response, dao);
             } else if (busquedaParam.equals("borrar")) {                
                 formularioBorrar(out, request, response, dao);                
             } else if (busquedaParam.equals("editar")) {                
                 formularioEditar(out, request, response, dao);                
             }
-            
             
         } catch (FileUploadException ex) {
            Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
@@ -81,51 +75,6 @@ public class ServletAdministrador2 extends HttpServlet {
     }
  
     private void formularioProductos(PrintWriter out, HttpServletRequest request, HttpServletResponse response, ProductosDAO dao) throws IOException, ServletException, FileUploadException {
-
-        if (request.getParameter("nombre")!=null && request.getParameter("categoria")!=null && request.getParameter("precio")!=null){
-            try {                
-                String nombre = request.getParameter("nombre");
-                String categoria = request.getParameter("categoria");
-                int precio = Integer.parseInt(request.getParameter("precio"));
-
-                // Create a factory for disk-based file items
-                DiskFileItemFactory factory = new DiskFileItemFactory();
-                String ubicacionArchivo = "img";
-                factory.setSizeThreshold(1024); 
-                factory.setRepository(new File(ubicacionArchivo));
-
-                // Configure a repository (to ensure a secure temp location is used)
-                ServletContext servletContext = this.getServletConfig().getServletContext();
-                File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-                factory.setRepository(repository);
-
-                // Create a new file upload handler
-                ServletFileUpload upload = new ServletFileUpload(factory);
-
-                // Parse the request
-                List<FileItem> items = upload.parseRequest(request);
-                String imagen = "";
-                String barra = System.getProperty("file.separator");
-                
-                // Process the uploaded items
-                for(FileItem item : items){
-                    if (!(item.isFormField())) {
-                        File file = new File( ubicacionArchivo, item.getName());
-                        item.write(file);
-                        imagen = SAVE_DIR + barra + item.getName();
-                    }
-                }
-                
-                
-                dao.insertProducto(nombre, categoria, imagen, precio);   
-                
-            } catch(NumberFormatException e){
-                out.println("<b>Error al acceder al listado de productos</b>");
-                e.printStackTrace();
-            } catch (Exception ex) {
-                Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
         try {
            response.sendRedirect("AdminProductos.jsp");
        } catch (IOException ex) {
