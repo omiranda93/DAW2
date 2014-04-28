@@ -51,15 +51,16 @@ public class ServletAnadirProducto extends HttpServlet {
         
             try {
                 String barra = System.getProperty("file.separator");
-                String ruta = request.getServletContext().getRealPath("").concat(barra).concat("img").concat(barra);
+                String ruta = request.getServletContext().getRealPath("");
+                ruta = ruta.subSequence(0, ruta.indexOf("build")).toString() +
+                        ruta.subSequence(ruta.indexOf("build")+6, ruta.length());
+                ruta = ruta.concat(barra).concat("img").concat(barra);
                 
                 
                 // Create a factory for disk-based file items
                 DiskFileItemFactory factory = new DiskFileItemFactory();
-                factory.setSizeThreshold(1000000);
-                //si es 1024, crea archivo temporal y también da error con dicho archivo
-                //si se deja con un número alto, no guarda en temporal y da error con el nombre
-                //del archivo subido
+                factory.setSizeThreshold(1000000000);
+                //nos aseguramos de que no cree archivo temporal (opcional)
                 factory.setRepository(new File(ruta));
                 
                 // Create a new file upload handler
@@ -79,14 +80,22 @@ public class ServletAnadirProducto extends HttpServlet {
                 
                 String nombre = "";
                 String categoria = "";
+                Boolean editar = false;
                 int precio = 0;
+                
+                List<Producto>productos = (List) request.getSession().getAttribute("listaProductos");
                 
                 // Process the uploaded items
                 for(FileItem item : items){
                     if (!(item.isFormField())) {
-                        File file = new File( ruta, item.getName());
-                        item.write(file);
-                        imagen = "img"+barra+item.getName();
+                        if (item.getSize() != -1){
+                            File file = new File(ruta, item.getName());
+                            item.write(file);
+                            imagen = "img"+barra+item.getName();
+                        } else if (editar) {
+                            int posicion = parseInt(request.getParameter("contador"));
+                            imagen = productos.get(posicion).getImagen();
+                        }
                     } else {
                         String campo = item.getFieldName();
                         if (campo.equals("nombre")) {
@@ -95,12 +104,28 @@ public class ServletAnadirProducto extends HttpServlet {
                             categoria = item.getString();
                         } else if (campo.equals("precio")) {
                             precio = Integer.parseInt(item.getString());
+                        } else if (campo.equals("accion")) {
+                            String accion = item.getString();
+                            if (accion.equals("editar")) {
+                                editar = true;
+                            }
                         }
                     }
                 }
                 
+                if (editar) {
+                    dao.deleteProducto(nombre);
+                    productos = null;
+                }
                 
-                dao.insertProducto(nombre, categoria, imagen, precio);   
+                dao.insertProducto(nombre, categoria, imagen, precio);
+                request.getSession().setAttribute("listaProductos", dao.getTodosProductos());
+                
+                try {
+                    response.sendRedirect("AdminProductos.jsp");
+                } catch (IOException ex) {
+                    Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 
             } catch(NumberFormatException e){
                 out.println("<b>Error al acceder al listado de productos</b>");
