@@ -119,13 +119,6 @@ public class ServletAnadirProducto extends HttpServlet {
                 }
                 
                 dao.insertProducto(nombre, categoria, imagen, precio);
-                request.getSession().setAttribute("listaProductos", dao.getTodosProductos());
-                
-                try {
-                    response.sendRedirect("AdminProductos.jsp");
-                } catch (IOException ex) {
-                    Logger.getLogger(ServletAdministrador2.class.getName()).log(Level.SEVERE, null, ex);
-                }
                 
             } catch(NumberFormatException e){
                 out.println("<b>Error al acceder al listado de productos</b>");
