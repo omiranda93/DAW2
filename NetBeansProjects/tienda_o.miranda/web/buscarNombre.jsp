@@ -35,6 +35,8 @@
                     </td><td>${producto.categoria}
                     </td><td><img style="max-height: 200px; max-width: 200px" src="${producto.imagen}"/>
                     </td><td><form method="get" action='ServletCarrito?'>
+                            Nº de unidades:
+                            <input type="text" name="cantidad">
                             <input type='submit' name='agregar' value='Agregar' onclick="alert('Ha añadido este producto al carrito.')">
                             <input type='hidden' name='contador' value='${contador.index}'>
                             <input type='hidden' name='busqueda' value='nombre'>

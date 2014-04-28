@@ -16,11 +16,12 @@
     </head>
     <body>
         <table>
-            <tr><td><b>Nombre</b></td><td><b>Precio</b></td><td><b>Categoria</b></td><tr>
+            <tr><td><b>Nombre</b></td><td><b>Precio</b></td><td><b>Categoria</b></td><td><b>Cantidad</b></td><tr>
             <c:forEach var="producto" items="${listaCarrito}">
                 <tr><td>${producto.nombre}
                     </td><td>${producto.precio}
                     </td><td>${producto.categoria}
+                    </td><td>${producto.cantidad}    
                     </td><td><img style="max-height: 200px; max-width: 200px" src="${producto.imagen}"/>
                 </td></tr>
             </c:forEach>

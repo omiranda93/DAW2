@@ -52,6 +52,7 @@ public class ServletCarrito extends HttpServlet {
                 if(("Agregar".equals(request.getParameter("agregar")))){ 
                     List<Producto>productos = (List) request.getSession().getAttribute("listaProductosPrecio");
                     int posicion = parseInt(request.getParameter("contador"));
+                    productos.get(posicion).setCantidad(Integer.parseInt(request.getParameter("cantidad")));
                     carrito.add(productos.get(posicion));
                     request.getSession().setAttribute("listaCarrito", carrito);
                     productos=null;
@@ -61,6 +62,7 @@ public class ServletCarrito extends HttpServlet {
                 if(("Agregar".equals(request.getParameter("agregar")))){ 
                     List<Producto>productos = (List) request.getSession().getAttribute("listaProductosNombre");
                     int posicion = parseInt(request.getParameter("contador"));
+                    productos.get(posicion).setCantidad(Integer.parseInt(request.getParameter("cantidad")));
                     carrito.add(productos.get(posicion));
                     request.getSession().setAttribute("listaCarrito", carrito);
                     productos=null;
@@ -70,6 +72,7 @@ public class ServletCarrito extends HttpServlet {
                 if(("Agregar".equals(request.getParameter("agregar")))){ 
                     List<Producto>productos = (List) request.getSession().getAttribute("listaProductosCategoria");
                     int posicion = parseInt(request.getParameter("contador"));
+                    productos.get(posicion).setCantidad(Integer.parseInt(request.getParameter("cantidad")));
                     carrito.add(productos.get(posicion));
                     request.getSession().setAttribute("listaCarrito", carrito);
                     productos=null;
@@ -80,6 +83,7 @@ public class ServletCarrito extends HttpServlet {
                 if(("Agregar".equals(request.getParameter("agregar")))){ 
                     List<Producto>productos = (List) request.getSession().getAttribute("listaProductos");
                     int posicion = parseInt(request.getParameter("contador"));
+                    productos.get(posicion).setCantidad(Integer.parseInt(request.getParameter("cantidad")));
                     carrito.add(productos.get(posicion));
                     request.getSession().setAttribute("listaCarrito", carrito);
                     productos=null;
@@ -92,27 +96,8 @@ public class ServletCarrito extends HttpServlet {
                         numeroPedido++;
                     }
                     pdao.insertPedido(numeroPedido, request.getParameter("nombre"), false);
-                    
-                    List <Producto> seleccionados = new ArrayList <Producto>();
-                    for(Producto prod : carrito){
-                        if(seleccionados.isEmpty()){
-                            seleccionados.add(prod);
-                        }else{
-                            for(Producto p: seleccionados){
-                                if (!(prod.getNombre().equals(p.getNombre()))){
-                                    seleccionados.add(prod);
-                                
-                                }
-                            }
-                        }
-                    }
-                    for(Producto prod:seleccionados){
-                        rdao.insertRelacion(prod.getNombre(), numeroPedido, 0);
-                    }
-                    for(Producto prod: carrito){
-                        if(seleccionados.contains(prod)){
-                            rdao.sumaCantidad(prod.getNombre());
-                        }
+                    for(Producto prod:carrito){
+                        rdao.insertRelacion(prod.getNombre(), numeroPedido, prod.getCantidad());
                     }
                 }
                 response.sendRedirect("index.jsp");
