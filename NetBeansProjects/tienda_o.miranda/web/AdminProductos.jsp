@@ -20,7 +20,9 @@
         <table>
             <tr><td><b>Productos</b></td></tr>
                 <c:forEach var="producto" items="${listaProductos}" varStatus="contador">
-                <tr><td><form method= "post" action='ServletAdministrador2' enctype="multipart/form-data">
+                <tr><td><form method= "post" action='ServletAnadirProducto' enctype="multipart/form-data">
+                            <input type='hidden' name='accion' value='editar'>
+                            <input type='hidden' name='contador' value='${contador.index}'>
                             <input type='text' name='nombre' value="${producto.nombre}">
                             <input type='text' name='precio' value="${producto.precio}">
                             <select name='categoria'>
@@ -30,15 +32,14 @@
                                 <option value='Drogueria'>Droguería</option>
                                 <option value='Prensa'>Prensa</option>
                             </select>
+                            <input type='file' name='imagen' size='60'>
                             <input type='submit' name='editar' value='Editar' onclick="alert('Has editado este producto')">
-                            <input type='hidden' name='contador' value='${contador.index}'>
-                            <input type='hidden' name='busqueda' value='editar'>
                         </form>
                     </td><td><form method="get" action='ServletAdministrador2' >
-                                <input type='submit' name='borrar' value='Borrar' onclick="alert('Has borrado este producto')">
-                                <input type='hidden' name='contador' value='${contador.index}'>
-                                <input type='hidden' name='busqueda' value='borrar'>
-                            </form>
+                            <input type='hidden' name='busqueda' value='borrar'>
+                            <input type='submit' name='borrar' value='Borrar' onclick="alert('Has borrado este producto')">
+                            <input type='hidden' name='contador' value='${contador.index}'>
+                        </form>
                     </td>
                 </tr>
 
@@ -58,6 +59,7 @@
             <input type='file' name='imagen' size='60'>
             <b>Precio:</b>
             <input type='text' name='precio'>
+            <input type='hidden' name='accion' value='anadir'>
             <input type='submit' name='Añadir' value='Agregar' onclick="alert('Has añadido este producto a los disponibles.')">
         </form>
         <a href="Administracion.jsp">Volver</a>
