@@ -22,11 +22,9 @@
             
         </form>
         <div>
-        <%String s="";
-            if(request.getParameter("error")!=null){
-            s = "Error en usuario o contraseña";
-        }%>
-        <%=s%>
+        <c:if test="${error!=null}">
+            Error en usuario o contraseña
+        </c:if>
         </div>
     </body>
 </html>
